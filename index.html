@@ -3,342 +3,242 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Vet Hero Clinic 🐾</title>
+<title>Vet Career Simulator</title>
+
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-body {
-  background: linear-gradient(135deg, #e0f2fe, #f0f9ff);
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-}
-.game-container {
-  width: 100%;
-  max-width: 1180px;
-  background: white;
-  border-radius: 24px;
-  overflow: hidden;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.15);
-}
-.topbar {
-  background: #0f766e;
-  color: white;
-  padding: 18px 30px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 1.15rem;
-}
-.title { font-size: 2.2rem; font-weight: bold; }
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #eef3f8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
 
-.main {
-  display: grid;
-  grid-template-columns: 3fr 1fr;
-  gap: 24px;
-  padding: 24px;
-}
-.clinic-room {
-  background: #f0f9ff;
-  border-radius: 20px;
-  padding: 24px;
-  position: relative;
-  min-height: 560px;
-}
-.patient-card {
-  background: white;
-  border-radius: 20px;
-  padding: 24px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-  text-align: center;
-}
-.animal {
-  font-size: 9.5rem;
-  margin: 10px 0 15px;
-  transition: all 0.4s;
-}
-.heal .animal { animation: healAnim 0.8s ease; }
-.die .animal { animation: dieAnim 1s ease forwards; }
+  .app {
+    width: 900px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    overflow: hidden;
+  }
 
-@keyframes healAnim { 0%{transform:scale(1)} 40%{transform:scale(1.2)} 100%{transform:scale(1)} }
-@keyframes dieAnim { 0%{transform:translateX(0)} 25%{transform:translateX(-20px)} 50%{transform:translateX(20px)} 100%{transform:translateY(40px) scale(0.7); opacity:0.4;} }
+  .main {
+    padding: 20px;
+    border-right: 1px solid #ddd;
+  }
 
-.health-bar {
-  height: 30px;
-  background: #e2e8f0;
-  border-radius: 999px;
-  overflow: hidden;
-  margin: 20px 0;
-}
-.health-fill {
-  height: 100%;
-  background: linear-gradient(to right, #ef4444, #22c55e);
-  transition: width 0.4s;
-}
+  .sidebar {
+    padding: 20px;
+    background: #f7fafc;
+  }
 
-.actions {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  margin-top: 20px;
-}
-button {
-  padding: 16px 10px;
-  border: none;
-  border-radius: 12px;
-  background: #0ea5e9;
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 1.05rem;
-}
-button:hover { background: #0284c7; transform: translateY(-2px); }
+  h1 {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
 
-.explain {
-  font-size: 0.9rem;
-  color: #64748b;
-  margin-top: 6px;
-  min-height: 42px;
-}
+  .card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+    margin-top: 15px;
+  }
 
-.progress {
-  font-size: 1rem;
-  margin: 12px 0;
-  color: #0f766e;
-  font-weight: 600;
-}
+  button {
+    margin-top: 10px;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+  }
 
-.sidebar { display: flex; flex-direction: column; gap: 20px; }
-.panel {
-  background: #f8fafc;
-  padding: 18px;
-  border-radius: 16px;
-}
-.log {
-  height: 220px;
-  overflow-y: auto;
-  background: white;
-  padding: 12px;
-  border-radius: 12px;
-  font-size: 0.95rem;
-}
+  .treat { background: #2d7ef7; color: white; }
+  .scan { background: #19b37a; color: white; }
+  .assist { background: #6c63ff; color: white; }
+
+  .status {
+    font-size: 14px;
+    margin-top: 10px;
+  }
+
+  .bar {
+    height: 10px;
+    background: #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-top: 5px;
+  }
+
+  .fill {
+    height: 100%;
+    background: #2d7ef7;
+    width: 100%;
+    transition: width 0.3s;
+  }
+
+  .log {
+    height: 250px;
+    overflow-y: auto;
+    font-size: 13px;
+    background: #111;
+    color: #0f0;
+    padding: 10px;
+    border-radius: 8px;
+  }
+
 </style>
 </head>
+
 <body>
 
-<div class="game-container">
-  <div class="topbar">
-    <div class="title">🐾 Vet Hero Clinic</div>
-    <div>
-      ⭐ Score: <span id="score">0</span> &nbsp;&nbsp;
-      💀 Deaths: <span id="deaths">0</span>/3 &nbsp;&nbsp;
-      🏆 Level: <span id="level">1</span>
+<div class="app">
+  <div class="main">
+    <h1>Veterinary Clinic Simulator</h1>
+    <p id="levelText">Level 1 Clinic</p>
+
+    <div class="card">
+      <h3>Current Patient</h3>
+      <p id="patientInfo">Loading patient...</p>
+
+      <div class="status">
+        Patient Health
+        <div class="bar"><div class="fill" id="healthBar"></div></div>
+      </div>
+
+      <div class="status">
+        Diagnosis Confidence
+        <div class="bar"><div class="fill" id="diagBar"></div></div>
+      </div>
+
+      <button class="scan" onclick="scanPatient()">Run Diagnostic Scan</button>
+      <button class="treat" onclick="treatPatient()">Administer Treatment</button>
+      <button class="assist" onclick="useAssistant()">Call Vet Technician (Teamwork)</button>
+    </div>
+
+    <div class="card">
+      <h3>Medical Tools Panel</h3>
+      <p id="tools">Stethoscope, blood test kit, imaging scanner</p>
     </div>
   </div>
 
-  <div class="main">
-    <div class="clinic-room">
-      <div class="patient-card" id="patientCard">
-        <h2 id="patientName"></h2>
-        <p id="conditionText" style="color:#475569; font-size:1.1rem;"></p>
-        
-        <div class="animal" id="animalEmoji"></div>
+  <div class="sidebar">
+    <h3>Clinic Stats</h3>
+    <p>Score: <span id="score">0</span></p>
+    <p>Patients Healed: <span id="healed">0</span></p>
 
-        <div class="health-bar">
-          <div class="health-fill" id="healthFill"></div>
-        </div>
+    <h3>Team Member</h3>
+    <p><b>Vet Technician:</b> Assists with diagnostics and stabilizing patients.</p>
 
-        <div class="progress" id="progressText">Treatments: 0 / 3</div>
-
-        <div class="actions" id="actions"></div>
-      </div>
-
-      <div class="overlay" id="overlay" style="display:none; position:absolute; inset:0; background:rgba(15,23,42,0.92); color:white; justify-content:center; align-items:center; flex-direction:column; text-align:center; padding:40px; border-radius:20px;">
-        <h1 id="overlayTitle"></h1>
-        <p id="overlayText"></p>
-        <button onclick="restartGame()" style="margin-top:25px; padding:14px 40px; font-size:1.2rem; border-radius:12px;">Play Again</button>
-      </div>
-    </div>
-
-    <div class="sidebar">
-      <div class="panel">
-        <h3>👩‍⚕️ Assistant Mia</h3>
-        <p>Mia helps when things are hard. Real vets work as a team!</p>
-        <button onclick="callAssistant()" style="margin-top:10px; background:#8b5cf6; width:100%;">Call Mia for Help</button>
-      </div>
-
-      <div class="panel">
-        <h3>📋 Activity Log</h3>
-        <div class="log" id="logBox"></div>
-      </div>
-    </div>
+    <h3>Activity Log</h3>
+    <div class="log" id="log"></div>
   </div>
 </div>
 
 <script>
-// Expanded Animals & Illnesses
-const patientsPool = [
-  { name: "Bella the Dog", emoji: "🐶", condition: "Ear Infection" },
-  { name: "Milo the Cat", emoji: "🐱", condition: "Broken Leg" },
-  { name: "Luna the Rabbit", emoji: "🐰", condition: "Tummy Ache" },
-  { name: "Rio the Parrot", emoji: "🐦", condition: "Breathing Trouble" },
-  { name: "Max the Turtle", emoji: "🐢", condition: "Shell Crack" },
-  { name: "Coco the Hamster", emoji: "🐹", condition: "Overgrown Teeth" },
-  { name: "Daisy the Pony", emoji: "🐴", condition: "Hoof Injury" },
-  { name: "Shadow the Puppy", emoji: "🐕", condition: "Skin Allergy" },
-  { name: "Snowy the Kitten", emoji: "🐱", condition: "Eye Infection" },
-  { name: "Rocky the Guinea Pig", emoji: "🐹", condition: "Vitamin Deficiency" }
+let patient;
+let score = 0;
+let healed = 0;
+let level = 1;
+
+const illnesses = [
+  "Bacterial Infection",
+  "Dehydration",
+  "Fracture",
+  "Respiratory Distress",
+  "Parasitic Infection",
+  "Unknown Viral Condition"
 ];
 
-let currentPatient, score = 0, deaths = 0, level = 1, health = 100, stepIndex = 0, assistantUsed = false;
-let requiredSteps = 3;
-
-const healthFill = document.getElementById("healthFill");
-const logBox = document.getElementById("logBox");
-const progressText = document.getElementById("progressText");
-
-const actionList = [
-  { id: "examine", name: "Examine", desc: "Check eyes, ears & heart" },
-  { id: "xray", name: "X-Ray", desc: "Take picture of bones" },
-  { id: "medicine", name: "Give Medicine", desc: "Give the right medicine" },
-  { id: "painkillers", name: "Pain Relief", desc: "Help stop the pain" },
-  { id: "cast", name: "Put Cast", desc: "Fix broken bones" },
-  { id: "clean", name: "Clean Wound", desc: "Clean the injury" },
-  { id: "special_food", name: "Special Food", desc: "Give healing food" }
+const animals = [
+  "Dog", "Cat", "Rabbit", "Fox", "Hedgehog", "Ferret", "Goat"
 ];
 
-function calculateRequiredSteps() {
-  return 2 + level;   // Level 1 = 3, Level 2 = 4, Level 3 = 5, etc.
+function log(msg){
+  document.getElementById("log").innerHTML += msg + "<br>";
+  document.getElementById("log").scrollTop = 999999;
 }
 
-function loadNewPatient() {
-  currentPatient = patientsPool[Math.floor(Math.random() * patientsPool.length)];
-  stepIndex = 0;
-  requiredSteps = calculateRequiredSteps();
-  
-  health = 32 + Math.random() * 18;   // Starts sick but alive
-  assistantUsed = false;
+function newPatient(){
+  patient = {
+    animal: animals[Math.floor(Math.random()*animals.length)],
+    illness: illnesses[Math.floor(Math.random()*Math.min(level+2, illnesses.length))],
+    health: 100 - Math.floor(Math.random()*40),
+    diagnosis: 0
+  };
 
-  document.getElementById("patientName").textContent = currentPatient.name;
-  document.getElementById("animalEmoji").textContent = currentPatient.emoji;
-  document.getElementById("conditionText").textContent = currentPatient.condition;
+  document.getElementById("patientInfo").innerText =
+    `${patient.animal} with suspected ${patient.illness}`;
 
-  renderButtons();
-  updateHealth();
-  updateProgress();
-  addLog(`🆕 New patient: ${currentPatient.name} (${currentPatient.condition})`);
-}
-
-function updateHealth() {
-  if (health <= 0) {
-    document.getElementById("patientCard").classList.add("die");
-    setTimeout(failPatient, 900);
-    return;
-  }
-  healthFill.style.width = health + "%";
-}
-
-function updateProgress() {
-  progressText.textContent = `Treatments: ${stepIndex} / ${requiredSteps}`;
-}
-
-function failPatient() {
-  deaths++;
-  score = Math.max(0, score - 100);
-  addLog("💀 Patient died... Be more careful!");
   updateUI();
+  log("New patient arrived.");
+}
 
-  if (deaths >= 3) {
-    showOverlay("Game Over", `You lost 3 patients.<br>Final Score: ${score}`);
+function updateUI(){
+  document.getElementById("healthBar").style.width = patient.health + "%";
+  document.getElementById("diagBar").style.width = patient.diagnosis + "%";
+  document.getElementById("score").innerText = score;
+  document.getElementById("healed").innerText = healed;
+  document.getElementById("levelText").innerText = "Level " + level + " Clinic";
+}
+
+function scanPatient(){
+  let boost = 25 + level * 2;
+  patient.diagnosis = Math.min(100, patient.diagnosis + boost);
+  log("Diagnostic scan completed. Data improved.");
+  updateUI();
+}
+
+function treatPatient(){
+  if(patient.diagnosis < 50){
+    log("Treatment failed: insufficient diagnosis data.");
+    patient.health -= 10;
   } else {
-    setTimeout(loadNewPatient, 1000);
+    let heal = 20 + level * 5;
+    patient.health += heal;
+    log("Treatment administered successfully.");
   }
-}
 
-function perform(actionId) {
-  const action = actionList.find(a => a.id === actionId);
-  
-  addLog(`✅ Good job! ${action.name}`);
-  health = Math.min(100, health + 26);
-  score += 55 + (level * 12);
-  
-  document.getElementById("patientCard").classList.add("heal");
-  setTimeout(() => document.getElementById("patientCard").classList.remove("heal"), 700);
-  
-  stepIndex++;
-  updateProgress();
-  updateHealth();
+  if(patient.health >= 100){
+    healed++;
+    score += 50 * level;
+    log("Patient fully recovered!");
+    nextPatient();
+  }
+
   updateUI();
-
-  // Auto advance to next patient
-  if (stepIndex >= requiredSteps) {
-    addLog("🎉 Patient is healthy again! Great work doctor!");
-    score += 200;
-    setTimeout(loadNewPatient, 1400);
-  }
+  checkFailure();
 }
 
-function callAssistant() {
-  if (assistantUsed) return;
-  assistantUsed = true;
-  addLog("👩‍⚕️ Mia helped! Teamwork saved the day!");
-  health = Math.min(100, health + 35);
-  score += 50;
-  updateHealth();
+function useAssistant(){
+  patient.diagnosis += 20;
+  patient.health += 10;
+  log("Vet Technician assisted: stabilization + faster diagnosis.");
   updateUI();
 }
 
-function renderButtons() {
-  const container = document.getElementById("actions");
-  container.innerHTML = "";
-
-  actionList.forEach(action => {
-    const btn = document.createElement("button");
-    btn.innerHTML = `${action.name}<div class="explain">${action.desc}</div>`;
-    btn.onclick = () => perform(action.id);
-    container.appendChild(btn);
-  });
-}
-
-function updateUI() {
-  document.getElementById("score").textContent = Math.floor(score);
-  document.getElementById("deaths").textContent = deaths;
-  
-  const newLevel = Math.floor(score / 500) + 1;
-  if (newLevel > level) {
-    level = newLevel;
-    addLog(`🏆 Level Up! Now Level ${level}`);
+function checkFailure(){
+  if(patient.health <= 0){
+    log("Patient condition critical. Case failed.");
+    nextPatient();
   }
-  document.getElementById("level").textContent = level;
 }
 
-function addLog(text) {
-  const div = document.createElement("div");
-  div.textContent = text;
-  logBox.prepend(div);
-  if (logBox.children.length > 12) logBox.removeChild(logBox.lastChild);
+function nextPatient(){
+  if(score > level * 120){
+    level++;
+    log("Clinic upgraded! New difficulty unlocked.");
+  }
+  newPatient();
 }
 
-function showOverlay(title, message) {
-  document.getElementById("overlayTitle").innerHTML = title;
-  document.getElementById("overlayText").innerHTML = message;
-  document.getElementById("overlay").style.display = "flex";
-}
-
-function restartGame() {
-  score = 0; 
-  deaths = 0; 
-  level = 1;
-  document.getElementById("overlay").style.display = "none";
-  logBox.innerHTML = "";
-  loadNewPatient();
-  updateUI();
-}
-
-// Start Game
-loadNewPatient();
-updateUI();
+newPatient();
 </script>
+
 </body>
 </html>
