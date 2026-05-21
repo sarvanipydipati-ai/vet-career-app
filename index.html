@@ -1,79 +1,468 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vet Clinic Pro</title>
-    <style>
-        body { font-family: 'Arial', sans-serif; background: #f0f4f8; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        #game-container { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); text-align: center; width: 350px; }
-        .hidden { display: none; }
-        button { padding: 12px 25px; margin: 10px; cursor: pointer; border: none; border-radius: 8px; background: #3498db; color: white; font-weight: bold; }
-        button:hover { background: #2980b9; }
-        #pet { font-size: 80px; margin: 20px 0; }
-        .stats { font-size: 1.2rem; font-weight: bold; color: #2c3e50; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vet Hero Clinic</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(to bottom right, #dff4ff, #f4fbff);
+      color: #1f2937;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .game-container {
+      width: 100%;
+      max-width: 1100px;
+      background: white;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    }
+
+    .topbar {
+      background: #0f766e;
+      color: white;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .title {
+      font-size: 2rem;
+      font-weight: bold;
+    }
+
+    .stats {
+      display: flex;
+      gap: 20px;
+      font-size: 1rem;
+    }
+
+    .main {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+      padding: 25px;
+    }
+
+    .clinic-room {
+      background: #eef9ff;
+      border-radius: 20px;
+      padding: 20px;
+      position: relative;
+      min-height: 550px;
+    }
+
+    .patient-card {
+      background: white;
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+
+    .animal {
+      font-size: 6rem;
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .health-bar {
+      width: 100%;
+      height: 28px;
+      background: #d1d5db;
+      border-radius: 14px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .health-fill {
+      height: 100%;
+      background: linear-gradient(to right, #ef4444, #22c55e);
+      width: 70%;
+      transition: width 0.4s ease;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 14px;
+      border: none;
+      border-radius: 14px;
+      background: #0ea5e9;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 0.95rem;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      background: #0284c7;
+    }
+
+    button:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .panel {
+      background: #f8fafc;
+      border-radius: 20px;
+      padding: 18px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+    }
+
+    .panel h3 {
+      margin-bottom: 10px;
+      color: #0f766e;
+    }
+
+    .log {
+      height: 220px;
+      overflow-y: auto;
+      background: white;
+      padding: 10px;
+      border-radius: 12px;
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    .assistant-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+      background: white;
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    .assistant-emoji {
+      font-size: 2rem;
+    }
+
+    .progress-box {
+      margin-top: 10px;
+    }
+
+    .fact-box {
+      background: #d1fae5;
+      padding: 12px;
+      border-radius: 12px;
+      margin-top: 10px;
+      font-size: 0.95rem;
+    }
+
+    .success-screen {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.92);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      color: white;
+      text-align: center;
+      padding: 30px;
+      border-radius: 20px;
+    }
+
+    .success-screen h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+    }
+
+    .success-screen p {
+      max-width: 600px;
+      line-height: 1.6;
+      font-size: 1.1rem;
+    }
+
+    .restart-btn {
+      margin-top: 20px;
+      background: #22c55e;
+    }
+
+    @media (max-width: 900px) {
+      .main {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
+  <div class="game-container">
+    <div class="topbar">
+      <div>
+        <div class="title">🐾 Vet Hero Clinic</div>
+        <div>Learn what veterinarians really do!</div>
+      </div>
 
-<div id="game-container">
-    <div id="start-screen">
-        <h1>Vet Clinic Pro</h1>
-        <p>Keep the pets healthy! If health hits 0%, it's game over.</p>
-        <button onclick="startGame()">Start Game</button>
+      <div class="stats">
+        <div>⏱ Time: <span id="timer">90</span>s</div>
+        <div>⭐ Score: <span id="score">0</span></div>
+      </div>
     </div>
 
-    <div id="game-screen" class="hidden">
-        <div class="stats">Health: <span id="health">100</span>% | Score: <span id="score">0</span></div>
-        <div id="pet">🐶</div>
-        <button onclick="action('examine')">Examine</button>
-        <button onclick="action('treat')">Treat</button>
-        <p id="msg">A patient needs help!</p>
-    </div>
-</div>
+    <div class="main">
+      <div class="clinic-room">
+        <div class="patient-card">
+          <h2 id="patientName">Bella the Dog</h2>
+          <p id="conditionText">Bella is tired and may have an infection.</p>
 
-<script>
-    let health = 100;
+          <div class="animal" id="animalEmoji">🐶</div>
+
+          <div>
+            <strong>Patient Health</strong>
+            <div class="health-bar">
+              <div class="health-fill" id="healthFill"></div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button onclick="examinePatient()">🩺 Examine</button>
+            <button onclick="runXray()">🩻 X-Ray</button>
+            <button onclick="giveMedicine()">💊 Medicine</button>
+            <button onclick="performTreatment()">🧪 Treatment</button>
+          </div>
+        </div>
+
+        <div class="success-screen" id="successScreen">
+          <h1>🎉 Clinic Shift Complete!</h1>
+          <p>
+            You helped animals by using science, teamwork, medical tools,
+            and problem-solving skills — just like a real veterinarian.
+            Veterinarians work with assistants, technicians, and pet owners
+            every day to keep animals healthy.
+          </p>
+
+          <button class="restart-btn" onclick="restartGame()">Play Again</button>
+        </div>
+      </div>
+
+      <div class="sidebar">
+        <div class="panel">
+          <h3>👩‍⚕️ Vet Team</h3>
+
+          <div class="assistant-box">
+            <div class="assistant-emoji">🧑‍⚕️</div>
+            <div>
+              <strong>Maya — Vet Assistant</strong>
+              <p style="font-size:0.9rem; margin-top:4px;">
+                Helps prepare medicine and organize equipment.
+              </p>
+            </div>
+          </div>
+
+          <button style="margin-top:14px; width:100%;" onclick="askAssistant()">
+            Ask Assistant for Help
+          </button>
+
+          <div class="fact-box" id="assistantFact">
+            Teamwork is important because vet clinics rely on assistants,
+            technicians, and doctors working together.
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>📋 Medical Log</h3>
+          <div class="log" id="logBox"></div>
+        </div>
+
+        <div class="panel">
+          <h3>🎓 Career Facts</h3>
+          <div class="progress-box" id="careerFact">
+            Veterinarians use biology, chemistry, and medical technology to diagnose animals.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const patients = [
+      {
+        name: 'Bella the Dog',
+        emoji: '🐶',
+        condition: 'Bella may have an ear infection and low energy.',
+        solution: 'medicine',
+        fact: 'Vets often examine ears, skin, and temperature to diagnose infections.'
+      },
+      {
+        name: 'Milo the Cat',
+        emoji: '🐱',
+        condition: 'Milo hurt his leg while jumping.',
+        solution: 'xray',
+        fact: 'X-rays help veterinarians see broken bones and internal injuries.'
+      },
+      {
+        name: 'Luna the Rabbit',
+        emoji: '🐰',
+        condition: 'Luna is not eating normally and seems weak.',
+        solution: 'treatment',
+        fact: 'Vets monitor nutrition and hydration carefully for small animals.'
+      }
+    ];
+
+    let currentPatient = 0;
+    let health = 45;
     let score = 0;
-    let gameActive = false;
-    const pets = ['🐶', '🐱', '🐹', '🐰', '🦜'];
+    let timeLeft = 90;
+    let examined = false;
 
-    function startGame() {
-        document.getElementById('start-screen').classList.add('hidden');
-        document.getElementById('game-screen').classList.remove('hidden');
-        gameActive = true;
-        gameLoop();
+    const healthFill = document.getElementById('healthFill');
+    const timerEl = document.getElementById('timer');
+    const scoreEl = document.getElementById('score');
+    const logBox = document.getElementById('logBox');
+
+    function loadPatient() {
+      const patient = patients[currentPatient];
+
+      document.getElementById('patientName').textContent = patient.name;
+      document.getElementById('animalEmoji').textContent = patient.emoji;
+      document.getElementById('conditionText').textContent = patient.condition;
+      document.getElementById('careerFact').textContent = patient.fact;
+
+      health = 45;
+      examined = false;
+      updateHealth();
+
+      addLog(`New patient arrived: ${patient.name}`);
     }
 
-    function action(type) {
-        if (!gameActive) return;
-        if (type === 'examine') {
-            score += 10;
-            document.getElementById('msg').innerText = "Good diagnostic!";
-        } else {
-            score += 20;
-            document.getElementById('msg').innerText = "Excellent treatment!";
-        }
-        updateDisplay();
+    function updateHealth() {
+      healthFill.style.width = health + '%';
     }
 
-    function gameLoop() {
-        if (!gameActive) return;
-        health -= 5;
-        if (health <= 0) {
-            gameActive = false;
-            alert("Game Over! Final Score: " + score);
-            location.reload();
-        }
-        document.getElementById('pet').innerText = pets[Math.floor(Math.random() * pets.length)];
-        updateDisplay();
-        setTimeout(gameLoop, 2000);
+    function addLog(text) {
+      const entry = document.createElement('div');
+      entry.innerHTML = '• ' + text;
+      logBox.prepend(entry);
     }
 
-    function updateDisplay() {
-        document.getElementById('health').innerText = health;
-        document.getElementById('score').innerText = score;
+    function examinePatient() {
+      examined = true;
+      health += 5;
+      updateHealth();
+      addLog('You examined the patient using a stethoscope and medical observations.');
     }
-</script>
+
+    function runXray() {
+      processAction('xray', 'You used imaging technology to examine the patient.');
+    }
+
+    function giveMedicine() {
+      processAction('medicine', 'You gave carefully measured medicine to the patient.');
+    }
+
+    function performTreatment() {
+      processAction('treatment', 'You performed a medical treatment with sterile tools.');
+    }
+
+    function processAction(action, message) {
+      const patient = patients[currentPatient];
+
+      if (!examined) {
+        addLog('⚠️ Real vets examine patients before choosing treatment.');
+        return;
+      }
+
+      addLog(message);
+
+      if (action === patient.solution) {
+        health = 100;
+        score += 100;
+        scoreEl.textContent = score;
+        updateHealth();
+
+        addLog('✅ Correct diagnosis! The patient is recovering.');
+
+        setTimeout(() => {
+          currentPatient++;
+
+          if (currentPatient >= patients.length) {
+            endGame();
+          } else {
+            loadPatient();
+          }
+        }, 1500);
+      } else {
+        health -= 15;
+        updateHealth();
+        addLog('❌ That was not the best treatment for this condition.');
+      }
+    }
+
+    function askAssistant() {
+      const tips = [
+        'Assistants help prepare medical equipment before procedures.',
+        'Vet teams communicate constantly to care for animals safely.',
+        'Technicians often collect data like weight, temperature, and heart rate.',
+        'Working together helps clinics treat animals faster and more accurately.'
+      ];
+
+      const randomTip = tips[Math.floor(Math.random() * tips.length)];
+
+      document.getElementById('assistantFact').textContent = randomTip;
+
+      addLog('🧑‍⚕️ Maya helped organize tools and gave useful information.');
+
+      score += 10;
+      scoreEl.textContent = score;
+    }
+
+    function endGame() {
+      document.getElementById('successScreen').style.display = 'flex';
+    }
+
+    function restartGame() {
+      currentPatient = 0;
+      score = 0;
+      timeLeft = 90;
+      scoreEl.textContent = score;
+      timerEl.textContent = timeLeft;
+      logBox.innerHTML = '';
+      document.getElementById('successScreen').style.display = 'none';
+      loadPatient();
+    }
+
+    setInterval(() => {
+      timeLeft--;
+      timerEl.textContent = timeLeft;
+
+      if (timeLeft <= 0) {
+        endGame();
+      }
+    }, 1000);
+
+    loadPatient();
+  </script>
 </body>
 </html>
