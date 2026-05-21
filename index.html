@@ -312,35 +312,105 @@
         name: 'Bella the Dog',
         emoji: '🐶',
         condition: 'Bella may have an ear infection and low energy.',
-        solution: 'medicine',
-        fact: 'Vets often examine ears, skin, and temperature to diagnose infections.'
+        diagnosis: 'Ear Infection',
+        correctSteps: ['examine', 'scan', 'medicine'],
+        tools: ['Thermometer', 'Otoscope', 'Medicine Tray'],
+        fact: 'Vets use otoscopes to inspect ears and detect infections.'
       },
       {
         name: 'Milo the Cat',
         emoji: '🐱',
-        condition: 'Milo hurt his leg while jumping.',
-        solution: 'xray',
-        fact: 'X-rays help veterinarians see broken bones and internal injuries.'
+        condition: 'Milo injured his leg after falling from a shelf.',
+        diagnosis: 'Minor Fracture',
+        correctSteps: ['examine', 'xray', 'cast'],
+        tools: ['X-Ray Scanner', 'Bone Cast Kit'],
+        fact: 'Veterinarians use imaging machines to diagnose bone injuries.'
       },
       {
         name: 'Luna the Rabbit',
         emoji: '🐰',
-        condition: 'Luna is not eating normally and seems weak.',
-        solution: 'treatment',
-        fact: 'Vets monitor nutrition and hydration carefully for small animals.'
+        condition: 'Luna is weak and refuses to eat food.',
+        diagnosis: 'Digestive Problem',
+        correctSteps: ['examine', 'blood', 'treatment'],
+        tools: ['Blood Test Kit', 'Nutrition Monitor'],
+        fact: 'Small animals require constant monitoring of hydration and digestion.'
+      },
+      {
+        name: 'Rocky the Parrot',
+        emoji: '🦜',
+        condition: 'Rocky has trouble flapping one wing.',
+        diagnosis: 'Wing Injury',
+        correctSteps: ['examine', 'xray', 'treatment'],
+        tools: ['Bird Scale', 'X-Ray Scanner', 'Bandage Kit'],
+        fact: 'Bird veterinarians must handle fragile bones carefully.'
+      },
+      {
+        name: 'Nibbles the Hamster',
+        emoji: '🐹',
+        condition: 'Nibbles is sneezing and breathing heavily.',
+        diagnosis: 'Respiratory Infection',
+        correctSteps: ['examine', 'blood', 'medicine'],
+        tools: ['Microscope', 'Lab Testing Kit'],
+        fact: 'Tiny animals can become sick very quickly, so early diagnosis matters.'
+      },
+      {
+        name: 'Splash the Turtle',
+        emoji: '🐢',
+        condition: 'Splash has a cracked shell after an accident.',
+        diagnosis: 'Shell Damage',
+        correctSteps: ['examine', 'scan', 'treatment'],
+        tools: ['Shell Repair Tools', 'Protective Wrap'],
+        fact: 'Reptile veterinarians often work with shell injuries and temperature issues.'
+      },
+      {
+        name: 'Sunny the Horse',
+        emoji: '🐴',
+        condition: 'Sunny is limping after running during training.',
+        diagnosis: 'Muscle Strain',
+        correctSteps: ['examine', 'scan', 'treatment'],
+        tools: ['Ultrasound Scanner', 'Cooling Wraps'],
+        fact: 'Large animal vets often travel to farms and stables to treat horses.'
+      },
+      {
+        name: 'Bubbles the Goldfish',
+        emoji: '🐠',
+        condition: 'Bubbles is swimming slowly and staying near the surface.',
+        diagnosis: 'Water Quality Illness',
+        correctSteps: ['examine', 'blood', 'treatment'],
+        tools: ['Water Testing Kit', 'Aquarium Monitor'],
+        fact: 'Aquatic veterinarians test water conditions to keep fish healthy.'
+      },
+      {
+        name: 'Spike the Iguana',
+        emoji: '🦎',
+        condition: 'Spike has low energy and weak bones.',
+        diagnosis: 'Calcium Deficiency',
+        correctSteps: ['examine', 'blood', 'medicine'],
+        tools: ['Heat Lamp Monitor', 'Nutrition Chart'],
+        fact: 'Reptiles need proper lighting and nutrients to stay healthy.'
+      },
+      {
+        name: 'Penny the Penguin',
+        emoji: '🐧',
+        condition: 'Penny has an injured foot from slippery ice.',
+        diagnosis: 'Foot Injury',
+        correctSteps: ['examine', 'xray', 'cast'],
+        tools: ['Portable X-Ray', 'Protective Cast'],
+        fact: 'Zoo veterinarians care for animals from many different environments.'
       }
     ];
 
     let currentPatient = 0;
-    let health = 45;
     let score = 0;
-    let timeLeft = 90;
-    let examined = false;
+    let reputation = 100;
+    let health = 35;
+    let timeLeft = 180;
+    let completedSteps = [];
 
-    const healthFill = document.getElementById('healthFill');
     const timerEl = document.getElementById('timer');
     const scoreEl = document.getElementById('score');
     const logBox = document.getElementById('logBox');
+    const healthFill = document.getElementById('healthFill');
 
     function loadPatient() {
       const patient = patients[currentPatient];
@@ -348,13 +418,18 @@
       document.getElementById('patientName').textContent = patient.name;
       document.getElementById('animalEmoji').textContent = patient.emoji;
       document.getElementById('conditionText').textContent = patient.condition;
-      document.getElementById('careerFact').textContent = patient.fact;
+      document.getElementById('careerFact').innerHTML = `
+        <strong>Diagnosis Goal:</strong> ${patient.diagnosis}<br><br>
+        <strong>Medical Tools:</strong> ${patient.tools.join(', ')}<br><br>
+        ${patient.fact}
+      `;
 
-      health = 45;
-      examined = false;
+      completedSteps = [];
+      health = 35;
       updateHealth();
 
-      addLog(`New patient arrived: ${patient.name}`);
+      addLog(`🚑 ${patient.name} checked into the clinic.`);
+      addLog(`📋 Symptoms recorded. Begin medical examination.`);
     }
 
     function updateHealth() {
@@ -363,93 +438,163 @@
 
     function addLog(text) {
       const entry = document.createElement('div');
-      entry.innerHTML = '• ' + text;
+      entry.innerHTML = text;
       logBox.prepend(entry);
     }
 
+    function performStep(step, successText, failText) {
+      const patient = patients[currentPatient];
+      const expectedStep = patient.correctSteps[completedSteps.length];
+
+      if (step === expectedStep) {
+        completedSteps.push(step);
+        health += 20;
+        if (health > 100) health = 100;
+
+        updateHealth();
+        addLog(`✅ ${successText}`);
+
+        score += 50;
+        scoreEl.textContent = score;
+
+        if (completedSteps.length === patient.correctSteps.length) {
+          completePatient();
+        }
+      } else {
+        health -= 15;
+        reputation -= 10;
+
+        if (health < 0) health = 0;
+
+        updateHealth();
+
+        addLog(`❌ ${failText}`);
+        addLog(`⚠️ Real veterinarians follow organized diagnostic procedures.`);
+      }
+    }
+
     function examinePatient() {
-      examined = true;
-      health += 5;
-      updateHealth();
-      addLog('You examined the patient using a stethoscope and medical observations.');
+      performStep(
+        'examine',
+        'You checked heart rate, breathing, and symptoms with medical tools.',
+        'You skipped an important diagnostic step.'
+      );
     }
 
     function runXray() {
-      processAction('xray', 'You used imaging technology to examine the patient.');
+      performStep(
+        'xray',
+        'X-ray imaging revealed internal injuries safely.',
+        'The patient did not need imaging yet.'
+      );
+    }
+
+    function runBloodTest() {
+      performStep(
+        'blood',
+        'Blood test results helped identify the illness.',
+        'The blood test was ordered at the wrong time.'
+      );
+    }
+
+    function useScanner() {
+      performStep(
+        'scan',
+        'You used a digital scanner to inspect the infection.',
+        'The scan was not the correct next step.'
+      );
     }
 
     function giveMedicine() {
-      processAction('medicine', 'You gave carefully measured medicine to the patient.');
+      performStep(
+        'medicine',
+        'Medicine was carefully measured and administered.',
+        'Medicine was not appropriate yet.'
+      );
+    }
+
+    function applyCast() {
+      performStep(
+        'cast',
+        'You stabilized the injured leg with a protective cast.',
+        'A cast cannot be applied before confirming the injury.'
+      );
     }
 
     function performTreatment() {
-      processAction('treatment', 'You performed a medical treatment with sterile tools.');
-    }
-
-    function processAction(action, message) {
-      const patient = patients[currentPatient];
-
-      if (!examined) {
-        addLog('⚠️ Real vets examine patients before choosing treatment.');
-        return;
-      }
-
-      addLog(message);
-
-      if (action === patient.solution) {
-        health = 100;
-        score += 100;
-        scoreEl.textContent = score;
-        updateHealth();
-
-        addLog('✅ Correct diagnosis! The patient is recovering.');
-
-        setTimeout(() => {
-          currentPatient++;
-
-          if (currentPatient >= patients.length) {
-            endGame();
-          } else {
-            loadPatient();
-          }
-        }, 1500);
-      } else {
-        health -= 15;
-        updateHealth();
-        addLog('❌ That was not the best treatment for this condition.');
-      }
+      performStep(
+        'treatment',
+        'The treatment improved hydration and digestion.',
+        'Treatment was attempted too early.'
+      );
     }
 
     function askAssistant() {
-      const tips = [
-        'Assistants help prepare medical equipment before procedures.',
-        'Vet teams communicate constantly to care for animals safely.',
-        'Technicians often collect data like weight, temperature, and heart rate.',
-        'Working together helps clinics treat animals faster and more accurately.'
-      ];
+      const patient = patients[currentPatient];
+      const nextStep = patient.correctSteps[completedSteps.length];
 
-      const randomTip = tips[Math.floor(Math.random() * tips.length)];
+      const hints = {
+        examine: 'Maya says: Start by collecting patient data and symptoms.',
+        xray: 'Maya says: Imaging technology may help with bone injuries.',
+        blood: 'Maya says: A lab test could reveal internal problems.',
+        scan: 'Maya says: Use digital equipment to inspect the affected area.',
+        medicine: 'Maya says: The patient may need medication now.',
+        cast: 'Maya says: Stabilizing the injury is important.',
+        treatment: 'Maya says: The patient now needs supportive treatment.'
+      };
 
-      document.getElementById('assistantFact').textContent = randomTip;
+      document.getElementById('assistantFact').textContent = hints[nextStep];
 
-      addLog('🧑‍⚕️ Maya helped organize tools and gave useful information.');
+      addLog('🧑‍⚕️ Maya coordinated equipment and shared diagnostic advice.');
 
-      score += 10;
+      score += 15;
       scoreEl.textContent = score;
+    }
+
+    function completePatient() {
+      addLog('🎉 Successful diagnosis and treatment completed!');
+
+      score += 150;
+      scoreEl.textContent = score;
+
+      setTimeout(() => {
+        currentPatient++;
+
+        if (currentPatient >= patients.length) {
+          endGame();
+        } else {
+          loadPatient();
+        }
+      }, 1800);
     }
 
     function endGame() {
       document.getElementById('successScreen').style.display = 'flex';
+
+      document.querySelector('#successScreen p').innerHTML = `
+        Final Score: <strong>${score}</strong><br><br>
+        You completed your veterinary clinic shift by using:
+        <br>• Medical science
+        <br>• Diagnostic technology
+        <br>• Teamwork and communication
+        <br>• Careful problem-solving
+        <br><br>
+        Veterinarians work with assistants, lab technicians, and pet owners every day.
+      `;
     }
 
     function restartGame() {
       currentPatient = 0;
       score = 0;
-      timeLeft = 90;
+      reputation = 100;
+      timeLeft = 180;
+
       scoreEl.textContent = score;
       timerEl.textContent = timeLeft;
       logBox.innerHTML = '';
+
       document.getElementById('successScreen').style.display = 'none';
+
       loadPatient();
     }
 
@@ -461,6 +606,18 @@
         endGame();
       }
     }, 1000);
+
+    const actionsContainer = document.querySelector('.actions');
+
+    actionsContainer.innerHTML = `
+      <button onclick="examinePatient()">🩺 Examine</button>
+      <button onclick="useScanner()">🖥 Digital Scan</button>
+      <button onclick="runXray()">🩻 X-Ray</button>
+      <button onclick="runBloodTest()">🧬 Blood Test</button>
+      <button onclick="giveMedicine()">💊 Medicine</button>
+      <button onclick="applyCast()">🦴 Apply Cast</button>
+      <button onclick="performTreatment()">🧪 Treatment</button>
+    `;
 
     loadPatient();
   </script>
