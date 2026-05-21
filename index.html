@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Vet Hero Clinic • Real Vet Work</title>
+<title>Vet Hero Clinic 🐾</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
 body {
@@ -16,7 +16,7 @@ body {
 }
 .game-container {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1150px;
   background: white;
   border-radius: 24px;
   overflow: hidden;
@@ -29,9 +29,9 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
 }
-.title { font-size: 2.1rem; font-weight: bold; display: flex; align-items: center; gap: 12px; }
+.title { font-size: 2.2rem; font-weight: bold; }
 
 .main {
   display: grid;
@@ -53,21 +53,19 @@ body {
   box-shadow: 0 6px 20px rgba(0,0,0,0.08);
   text-align: center;
 }
-.animal-img {
-  width: 180px;
-  height: 180px;
-  object-fit: contain;
-  margin: 15px 0;
-  transition: transform 0.4s;
+.animal {
+  font-size: 9.5rem;
+  margin: 10px 0 15px;
+  transition: all 0.4s;
 }
-.heal .animal-img { animation: healAnim 0.8s ease; }
-.die .animal-img { animation: dieAnim 1s ease forwards; }
+.heal .animal { animation: healAnim 0.8s ease; }
+.die .animal { animation: dieAnim 1s ease forwards; }
 
-@keyframes healAnim { 0%{transform:scale(1)} 40%{transform:scale(1.15)} 100%{transform:scale(1)} }
-@keyframes dieAnim { 0%{transform:translateX(0)} 25%{transform:translateX(-15px)} 50%{transform:translateX(15px)} 100%{transform:translateY(30px) scale(0.8); opacity:0.3; filter:grayscale(1)} }
+@keyframes healAnim { 0%{transform:scale(1)} 40%{transform:scale(1.2)} 100%{transform:scale(1)} }
+@keyframes dieAnim { 0%{transform:translateX(0)} 25%{transform:translateX(-20px)} 50%{transform:translateX(20px)} 100%{transform:translateY(40px) scale(0.7); opacity:0.4;} }
 
 .health-bar {
-  height: 28px;
+  height: 30px;
   background: #e2e8f0;
   border-radius: 999px;
   overflow: hidden;
@@ -76,8 +74,8 @@ body {
 .health-fill {
   height: 100%;
   background: linear-gradient(to right, #ef4444, #22c55e);
-  width: 60%;
-  transition: width 0.4s ease;
+  width: 65%;
+  transition: width 0.4s;
 }
 
 .actions {
@@ -87,56 +85,37 @@ body {
   margin-top: 20px;
 }
 button {
-  padding: 14px;
+  padding: 16px 10px;
   border: none;
   border-radius: 12px;
   background: #0ea5e9;
   color: white;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  font-size: 1.05rem;
 }
 button:hover { background: #0284c7; transform: translateY(-2px); }
-button.call-assist { background: #8b5cf6; }
-button.call-assist:hover { background: #7c3aed; }
+
+.explain {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-top: 6px;
+  min-height: 42px;
+}
 
 .sidebar { display: flex; flex-direction: column; gap: 20px; }
 .panel {
   background: #f8fafc;
   padding: 18px;
   border-radius: 16px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 .log {
-  height: 240px;
+  height: 220px;
   overflow-y: auto;
   background: white;
   padding: 12px;
   border-radius: 12px;
   font-size: 0.95rem;
-  line-height: 1.5;
-}
-
-/* Overlay */
-.overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(15,23,42,0.92);
-  display: none;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  text-align: center;
-  padding: 40px;
-  border-radius: 20px;
-}
-.info-box {
-  background: rgba(255,255,255,0.15);
-  padding: 12px 20px;
-  border-radius: 12px;
-  margin: 15px 0;
-  max-width: 320px;
 }
 </style>
 </head>
@@ -153,13 +132,12 @@ button.call-assist:hover { background: #7c3aed; }
   </div>
 
   <div class="main">
-    <!-- Main Clinic Area -->
-    <div class="clinic-room" id="room">
+    <div class="clinic-room">
       <div class="patient-card" id="patientCard">
         <h2 id="patientName"></h2>
-        <p id="conditionText" style="color:#64748b; font-weight:500;"></p>
+        <p id="conditionText" style="color:#475569; font-size:1.1rem;"></p>
         
-        <img id="animalImg" class="animal-img" src="" alt="Patient">
+        <div class="animal" id="animalEmoji"></div>
 
         <div class="health-bar">
           <div class="health-fill" id="healthFill"></div>
@@ -168,172 +146,132 @@ button.call-assist:hover { background: #7c3aed; }
         <div class="actions" id="actions"></div>
       </div>
 
-      <!-- Game Over / Win Overlay -->
-      <div class="overlay" id="overlay">
+      <div class="overlay" id="overlay" style="display:none; position:absolute; inset:0; background:rgba(15,23,42,0.92); color:white; justify-content:center; align-items:center; flex-direction:column; text-align:center; padding:40px; border-radius:20px;">
         <h1 id="overlayTitle"></h1>
         <p id="overlayText"></p>
-        <button onclick="restartGame()" style="margin-top:20px; padding:14px 32px; font-size:1.1rem;">Play Again</button>
+        <button onclick="restartGame()" style="margin-top:25px; padding:14px 40px; font-size:1.2rem; border-radius:12px;">Play Again</button>
       </div>
     </div>
 
-    <!-- Sidebar -->
     <div class="sidebar">
       <div class="panel">
-        <h3>👩‍⚕️ Your Assistant: Mia</h3>
-        <p style="font-size:0.9rem; margin-bottom:12px;">Call Mia for help with complex tasks. Teamwork makes the clinic better!</p>
-        <button class="call-assist" onclick="callAssistant()">Call Assistant</button>
+        <h3>👩‍⚕️ Assistant Mia</h3>
+        <p>Mia helps when things are hard. Real vets work as a team!</p>
+        <button onclick="callAssistant()" style="margin-top:10px; background:#8b5cf6; width:100%;">Call Mia for Help</button>
       </div>
 
       <div class="panel">
         <h3>📋 Activity Log</h3>
         <div class="log" id="logBox"></div>
       </div>
-
-      <div class="panel">
-        <h3>💡 Vet Tip</h3>
-        <p id="vetTip" style="font-size:0.95rem; line-height:1.5;"></p>
-      </div>
     </div>
   </div>
 </div>
 
 <script>
-// ==================== DATA ====================
-const animalImages = {
-  dog: "https://picsum.photos/id/1015/300/300",   // replace with your own later
-  cat: "https://picsum.photos/id/201/300/300",
-  rabbit: "https://picsum.photos/id/251/300/300",
-  bird: "https://picsum.photos/id/180/300/300",
-  turtle: "https://picsum.photos/id/866/300/300"
-};
+// Game Data
+const patientsPool = [
+  { name: "Bella the Dog", emoji: "🐶", condition: "Ear Infection" },
+  { name: "Milo the Cat", emoji: "🐱", condition: "Broken Leg" },
+  { name: "Luna the Rabbit", emoji: "🐰", condition: "Tummy Problem" },
+  { name: "Rio the Bird", emoji: "🐦", condition: "Breathing Trouble" }
+];
 
-let currentPatient = null;
-let score = 0;
-let deaths = 0;
-const maxDeaths = 3;
-let level = 1;
-let health = 100;
-let stepIndex = 0;
-let assistantUsed = false;
+let currentPatient, score = 0, deaths = 0, level = 1, health = 100, stepIndex = 0, assistantUsed = false;
 
 const healthFill = document.getElementById("healthFill");
 const logBox = document.getElementById("logBox");
 
-const possiblePatients = [
-  { name: "Bella the Golden Retriever", type: "dog", condition: "Severe ear infection", image: animalImages.dog,
-    steps: ["examine", "otoscopy", "medicine", "followup"] },
-  { name: "Milo the Siamese Cat", type: "cat", condition: "Fractured leg", image: animalImages.cat,
-    steps: ["examine", "xray", "painkillers", "cast"] },
-  { name: "Luna the Holland Lop", type: "rabbit", condition: "GI Stasis", image: animalImages.rabbit,
-    steps: ["examine", "palpation", "fluids", "medicine"] },
-  { name: "Rio the Parrot", type: "bird", condition: "Respiratory infection", image: animalImages.bird,
-    steps: ["examine", "bloodtest", "antibiotics"] }
+const actionList = [
+  { id: "examine", name: "Examine", desc: "Check eyes, ears & heart" },
+  { id: "xray", name: "X-Ray", desc: "Take picture of bones" },
+  { id: "medicine", name: "Give Medicine", desc: "Give the right medicine" },
+  { id: "painkillers", name: "Pain Relief", desc: "Help stop the pain" },
+  { id: "cast", name: "Put Cast", desc: "Fix broken bones" }
 ];
 
-// ==================== CORE FUNCTIONS ====================
-function getRandomPatient() {
-  return {...possiblePatients[Math.floor(Math.random() * possiblePatients.length)]};
-}
-
-function increaseDifficulty() {
-  level = Math.floor(score / 350) + 1;
-  document.getElementById("level").textContent = level;
-}
-
 function loadNewPatient() {
-  currentPatient = getRandomPatient();
+  currentPatient = patientsPool[Math.floor(Math.random() * patientsPool.length)];
   stepIndex = 0;
-  health = 85 - (level * 5); // harder at higher levels
+  health = Math.max(65, 95 - (level * 6));
   assistantUsed = false;
 
   document.getElementById("patientName").textContent = currentPatient.name;
+  document.getElementById("animalEmoji").textContent = currentPatient.emoji;
   document.getElementById("conditionText").textContent = currentPatient.condition;
-  document.getElementById("animalImg").src = currentPatient.image;
 
-  renderActionButtons();
+  renderButtons();
   updateHealth();
-  addLog(`New patient arrived: ${currentPatient.name}`);
-  updateVetTip();
+  addLog(`🆕 New patient: ${currentPatient.name}`);
 }
 
 function updateHealth() {
   if (health <= 0) {
-    health = 0;
     document.getElementById("patientCard").classList.add("die");
     setTimeout(failPatient, 900);
     return;
   }
-  healthFill.style.width = `${health}%`;
+  healthFill.style.width = health + "%";
 }
 
 function failPatient() {
   deaths++;
-  score = Math.max(0, score - 120);
-  addLog("💀 Patient could not be saved");
+  score = Math.max(0, score - 100);
+  addLog("💀 Patient died... Try again!");
   updateUI();
 
-  if (deaths >= maxDeaths) {
-    showOverlay("Game Over", `You lost 3 patients.<br>Final Score: ${score}<br>Keep learning — real vets save lives through science and teamwork!`);
+  if (deaths >= 3) {
+    showOverlay("Game Over", `You lost 3 patients.<br>Final Score: ${score}`);
   } else {
-    setTimeout(loadNewPatient, 1200);
+    setTimeout(loadNewPatient, 1000);
   }
 }
 
-function perform(action) {
-  const expected = currentPatient.steps[stepIndex];
-  
-  if (action === expected) {
-    addLog(`✅ Correct: ${action.toUpperCase()}`);
-    health = Math.min(100, health + 22);
-    score += 45 + (level * 8);
+function perform(actionId) {
+  const isCorrect = true;   // All buttons are useful now - simpler for kids
+
+  if (isCorrect) {
+    const action = actionList.find(a => a.id === actionId);
+    addLog(`✅ Good job! ${action.name}`);
+    health = Math.min(100, health + 25);
+    score += 55 + (level * 10);
+    
     document.getElementById("patientCard").classList.add("heal");
-    setTimeout(() => document.getElementById("patientCard").classList.remove("heal"), 800);
+    setTimeout(() => document.getElementById("patientCard").classList.remove("heal"), 700);
+    
     stepIndex++;
   } else {
-    addLog(`❌ Wrong step for this condition`);
-    health -= 18;
+    health -= 22;
   }
 
-  updateUI();
   updateHealth();
+  updateUI();
 
-  if (stepIndex >= currentPatient.steps.length) {
-    addLog("🎉 Patient successfully treated!");
-    score += 150;
-    setTimeout(loadNewPatient, 800);
+  if (stepIndex >= 4) {
+    addLog("🎉 Patient is healthy again! You're a great vet!");
+    score += 160;
+    setTimeout(loadNewPatient, 900);
   }
 }
 
 function callAssistant() {
-  if (assistantUsed) {
-    addLog("Mia is already helping with another task.");
-    return;
-  }
+  if (assistantUsed) return;
   assistantUsed = true;
-  addLog("Mia joined! She performed one complex step for you.");
-  health = Math.min(100, health + 28);
-  score += 30;
+  addLog("👩‍⚕️ Mia helped! Great teamwork!");
+  health = Math.min(100, health + 32);
+  score += 45;
   updateHealth();
   updateUI();
 }
 
-// ==================== UI HELPERS ====================
-function renderActionButtons() {
+function renderButtons() {
   const container = document.getElementById("actions");
   container.innerHTML = "";
 
-  const actions = ["examine", "xray", "otoscopy", "palpation", "bloodtest", "medicine", "painkillers", "fluids", "cast"];
-  const labels = {
-    examine: "Physical Exam", xray: "Take X-Ray", otoscopy: "Ear Scope",
-    palpation: "Abdominal Palpation", bloodtest: "Blood Test",
-    medicine: "Prescribe Medicine", painkillers: "Give Pain Relief",
-    fluids: "IV Fluids", cast: "Apply Cast"
-  };
-
-  actions.forEach(act => {
+  actionList.forEach(action => {
     const btn = document.createElement("button");
-    btn.textContent = labels[act] || act;
-    btn.onclick = () => perform(act);
+    btn.innerHTML = `${action.name}<div class="explain">${action.desc}</div>`;
+    btn.onclick = () => perform(action.id);
     container.appendChild(btn);
   });
 }
@@ -341,24 +279,15 @@ function renderActionButtons() {
 function updateUI() {
   document.getElementById("score").textContent = score;
   document.getElementById("deaths").textContent = deaths;
-  increaseDifficulty();
+  level = Math.floor(score / 400) + 1;
+  document.getElementById("level").textContent = level;
 }
 
 function addLog(text) {
   const div = document.createElement("div");
   div.textContent = text;
   logBox.prepend(div);
-  if (logBox.children.length > 12) logBox.removeChild(logBox.lastChild);
-}
-
-function updateVetTip() {
-  const tips = [
-    "Listening to the heart and lungs is one of the most important parts of every exam.",
-    "X-rays help us see inside bones and organs without surgery.",
-    "Teamwork between vets and assistants saves more lives.",
-    "Medicine must be dosed carefully based on the animal’s weight."
-  ];
-  document.getElementById("vetTip").textContent = tips[Math.floor(Math.random()*tips.length)];
+  if (logBox.children.length > 10) logBox.removeChild(logBox.lastChild);
 }
 
 function showOverlay(title, message) {
@@ -368,9 +297,7 @@ function showOverlay(title, message) {
 }
 
 function restartGame() {
-  score = 0;
-  deaths = 0;
-  level = 1;
+  score = 0; deaths = 0; level = 1;
   document.getElementById("overlay").style.display = "none";
   logBox.innerHTML = "";
   loadNewPatient();
