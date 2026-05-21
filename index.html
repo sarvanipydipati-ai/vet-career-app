@@ -74,7 +74,6 @@ body {
 .health-fill {
   height: 100%;
   background: linear-gradient(to right, #ef4444, #22c55e);
-  width: 40%;
   transition: width 0.4s;
 }
 
@@ -101,6 +100,13 @@ button:hover { background: #0284c7; transform: translateY(-2px); }
   color: #64748b;
   margin-top: 6px;
   min-height: 42px;
+}
+
+.progress {
+  font-size: 1rem;
+  margin: 12px 0;
+  color: #0f766e;
+  font-weight: 600;
 }
 
 .sidebar { display: flex; flex-direction: column; gap: 20px; }
@@ -143,6 +149,8 @@ button:hover { background: #0284c7; transform: translateY(-2px); }
           <div class="health-fill" id="healthFill"></div>
         </div>
 
+        <div class="progress" id="progressText">Treatments: 0 / 5</div>
+
         <div class="actions" id="actions"></div>
       </div>
 
@@ -169,34 +177,47 @@ button:hover { background: #0284c7; transform: translateY(-2px); }
 </div>
 
 <script>
-// Combined Patient Data (from your original + new ones)
+// Expanded Animals & Illnesses
 const patientsPool = [
-  { name: "Bella the Dog", emoji: "🐶", condition: "Ear Infection", steps: 4 },
-  { name: "Milo the Cat", emoji: "🐱", condition: "Broken Leg", steps: 4 },
-  { name: "Luna the Rabbit", emoji: "🐰", condition: "Tummy Problem", steps: 4 },
-  { name: "Rio the Bird", emoji: "🐦", condition: "Breathing Trouble", steps: 4 }
+  { name: "Bella the Dog", emoji: "🐶", condition: "Ear Infection" },
+  { name: "Milo the Cat", emoji: "🐱", condition: "Broken Leg" },
+  { name: "Luna the Rabbit", emoji: "🐰", condition: "Tummy Ache" },
+  { name: "Rio the Parrot", emoji: "🐦", condition: "Breathing Trouble" },
+  { name: "Max the Turtle", emoji: "🐢", condition: "Shell Crack" },
+  { name: "Coco the Hamster", emoji: "🐹", condition: "Overgrown Teeth" },
+  { name: "Daisy the Pony", emoji: "🐴", condition: "Hoof Injury" },
+  { name: "Shadow the Puppy", emoji: "🐕", condition: "Skin Allergy" },
+  { name: "Snowy the Kitten", emoji: "🐱", condition: "Eye Infection" },
+  { name: "Rocky the Guinea Pig", emoji: "🐹", condition: "Vitamin Deficiency" }
 ];
 
 let currentPatient, score = 0, deaths = 0, level = 1, health = 100, stepIndex = 0, assistantUsed = false;
+let requiredSteps = 5;   // will change with level
 
 const healthFill = document.getElementById("healthFill");
 const logBox = document.getElementById("logBox");
+const progressText = document.getElementById("progressText");
 
 const actionList = [
   { id: "examine", name: "Examine", desc: "Check eyes, ears & heart" },
   { id: "xray", name: "X-Ray", desc: "Take picture of bones" },
   { id: "medicine", name: "Give Medicine", desc: "Give the right medicine" },
   { id: "painkillers", name: "Pain Relief", desc: "Help stop the pain" },
-  { id: "cast", name: "Put Cast", desc: "Fix broken bones" }
+  { id: "cast", name: "Put Cast", desc: "Fix broken bones" },
+  { id: "clean", name: "Clean Wound", desc: "Clean the injury" },
+  { id: "special_food", name: "Special Food", desc: "Give healing food" }
 ];
+
+function calculateRequiredSteps() {
+  return 4 + level;   // Level 1 = 5, Level 2 = 6, Level 3 = 7, etc.
+}
 
 function loadNewPatient() {
   currentPatient = patientsPool[Math.floor(Math.random() * patientsPool.length)];
   stepIndex = 0;
+  requiredSteps = calculateRequiredSteps();
   
-  // Health starts low (sick but not dead)
-  health = 35 + Math.random() * 15;   // Between 35% and 50%
-  
+  health = 32 + Math.random() * 18;   // Starts sick but not dead
   assistantUsed = false;
 
   document.getElementById("patientName").textContent = currentPatient.name;
@@ -205,6 +226,7 @@ function loadNewPatient() {
 
   renderButtons();
   updateHealth();
+  updateProgress();
   addLog(`🆕 New patient: ${currentPatient.name} (${currentPatient.condition})`);
 }
 
@@ -217,10 +239,14 @@ function updateHealth() {
   healthFill.style.width = health + "%";
 }
 
+function updateProgress() {
+  progressText.textContent = `Treatments: ${stepIndex} / ${requiredSteps}`;
+}
+
 function failPatient() {
   deaths++;
   score = Math.max(0, score - 100);
-  addLog("💀 Patient died... Be more careful next time!");
+  addLog("💀 Patient died... Be more careful!");
   updateUI();
 
   if (deaths >= 3) {
@@ -233,7 +259,6 @@ function failPatient() {
 function perform(actionId) {
   const action = actionList.find(a => a.id === actionId);
   
-  // Most actions are helpful (kid-friendly)
   addLog(`✅ Good job! ${action.name}`);
   health = Math.min(100, health + 26);
   score += 55 + (level * 12);
@@ -242,14 +267,15 @@ function perform(actionId) {
   setTimeout(() => document.getElementById("patientCard").classList.remove("heal"), 700);
   
   stepIndex++;
-
+  updateProgress();
   updateHealth();
   updateUI();
 
-  if (stepIndex >= 4) {
-    addLog("🎉 Patient is all better! Great work doctor!");
-    score += 180;
-    setTimeout(loadNewPatient, 900);
+  // Auto go to next patient when done
+  if (stepIndex >= requiredSteps) {
+    addLog("🎉 Patient is healthy again! Great work doctor!");
+    score += 200;
+    setTimeout(loadNewPatient, 1400);
   }
 }
 
@@ -278,7 +304,12 @@ function renderButtons() {
 function updateUI() {
   document.getElementById("score").textContent = Math.floor(score);
   document.getElementById("deaths").textContent = deaths;
-  level = Math.floor(score / 450) + 1;
+  
+  const newLevel = Math.floor(score / 500) + 1;
+  if (newLevel > level) {
+    level = newLevel;
+    addLog(`🏆 Level Up! Now Level ${level}`);
+  }
   document.getElementById("level").textContent = level;
 }
 
@@ -286,7 +317,7 @@ function addLog(text) {
   const div = document.createElement("div");
   div.textContent = text;
   logBox.prepend(div);
-  if (logBox.children.length > 11) logBox.removeChild(logBox.lastChild);
+  if (logBox.children.length > 12) logBox.removeChild(logBox.lastChild);
 }
 
 function showOverlay(title, message) {
