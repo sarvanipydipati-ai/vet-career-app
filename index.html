@@ -1,237 +1,130 @@
 <script>
-  const patients = [ /* SAME ARRAY AS YOUR ORIGINAL — unchanged */ 
-    // (keep your full patient list here exactly as you had it)
-  ];
-
-  let currentPatient = 0;
-  let score = 0;
-  let reputation = 100;
-  let health = 35;
-  let timeLeft = 180;
-  let completedSteps = [];
-  let level = 1;
-
-  const timerEl = document.getElementById('timer');
-  const scoreEl = document.getElementById('score');
-  const logBox = document.getElementById('logBox');
-  const healthFill = document.getElementById('healthFill');
-
-  function updateLevel() {
-    let newLevel = 1;
-
-    if (score >= 700) newLevel = 3;
-    else if (score >= 300) newLevel = 2;
-
-    if (newLevel !== level) {
-      level = newLevel;
-      addLog(`🏆 Level Up! You reached Level ${level} Vet Status!`);
-    }
+const patients = [
+  {
+    name: 'Bella the Dog',
+    emoji: '🐶',
+    condition: 'Bella may have an ear infection and low energy.',
+    diagnosis: 'Ear Infection',
+    correctSteps: ['examine', 'scan', 'medicine'],
+    tools: ['Thermometer', 'Otoscope', 'Medicine Tray'],
+    fact: 'Vets use otoscopes to inspect ears and detect infections.'
+  },
+  {
+    name: 'Milo the Cat',
+    emoji: '🐱',
+    condition: 'Milo injured his leg after falling from a shelf.',
+    diagnosis: 'Minor Fracture',
+    correctSteps: ['examine', 'xray', 'cast'],
+    tools: ['X-Ray Scanner', 'Bone Cast Kit'],
+    fact: 'Veterinarians use imaging machines to diagnose bone injuries.'
   }
+];
 
-  function checkHealthFailure() {
-    if (health <= 0) {
-      health = 0;
-      updateHealth();
+let currentPatient = 0;
+let score = 0;
+let health = 35;
+let level = 1;
 
-      addLog("🚨 Oh no! The patient's condition became critical due to incorrect treatment timing.");
-      addLog("📉 Score penalty applied for failed stabilization.");
+const timerEl = document.getElementById('timer');
+const scoreEl = document.getElementById('score');
+const logBox = document.getElementById('logBox');
+const healthFill = document.getElementById('healthFill');
 
-      score -= 50;
-      if (score < 0) score = 0;
-      scoreEl.textContent = score;
+function addLog(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  logBox.prepend(div);
+}
 
-      setTimeout(() => {
-        nextPatient();
-      }, 1500);
+function updateHealth() {
+  healthFill.style.width = health + '%';
 
-      return true;
-    }
-    return false;
-  }
-
-  function loadPatient() {
-    const patient = patients[currentPatient];
-
-    document.getElementById('patientName').textContent = patient.name;
-    document.getElementById('animalEmoji').textContent = patient.emoji;
-    document.getElementById('conditionText').textContent = patient.condition;
-
-    document.getElementById('careerFact').innerHTML = `
-      <strong>Diagnosis Goal:</strong> ${patient.diagnosis}<br><br>
-      <strong>Medical Tools:</strong> ${patient.tools.join(', ')}<br><br>
-      ${patient.fact}
-      <br><br>
-      <strong>Current Level:</strong> ${level}
-    `;
-
-    completedSteps = [];
-    health = 35;
-    updateHealth();
-
-    addLog(`🚑 ${patient.name} checked into the clinic.`);
-    addLog(`📋 New case started.`);
-  }
-
-  function updateHealth() {
-    healthFill.style.width = health + '%';
-  }
-
-  function addLog(text) {
-    const entry = document.createElement('div');
-    entry.innerHTML = text;
-    logBox.prepend(entry);
-  }
-
-  function performStep(step, successText, failText) {
-    const patient = patients[currentPatient];
-    const expectedStep = patient.correctSteps[completedSteps.length];
-
-    if (step === expectedStep) {
-      completedSteps.push(step);
-
-      health += 20;
-      if (health > 100) health = 100;
-
-      updateHealth();
-      addLog(`✅ ${successText}`);
-
-      score += 50;
-      scoreEl.textContent = score;
-
-      updateLevel();
-
-      if (completedSteps.length === patient.correctSteps.length) {
-        addLog("🎉 Patient stabilized successfully!");
-        setTimeout(nextPatient, 1200);
-      }
-
-    } else {
-      health -= 20;
-      reputation -= 10;
-
-      updateHealth();
-
-      addLog(`❌ ${failText}`);
-      addLog(`⚠️ Incorrect procedure order affects diagnosis accuracy.`);
-
-      if (checkHealthFailure()) return;
-    }
-
-    if (checkHealthFailure()) return;
-  }
-
-  function nextPatient() {
-    currentPatient++;
-
-    if (currentPatient >= patients.length) {
-      endGame();
-    } else {
-      loadPatient();
-    }
-  }
-
-  function examinePatient() {
-    performStep('examine',
-      'Vitals checked and symptoms recorded.',
-      'You skipped initial examination.'
-    );
-  }
-
-  function runXray() {
-    performStep('xray',
-      'X-ray scan completed successfully.',
-      'X-ray was not needed yet.'
-    );
-  }
-
-  function runBloodTest() {
-    performStep('blood',
-      'Blood sample analyzed.',
-      'Blood test was premature.'
-    );
-  }
-
-  function useScanner() {
-    performStep('scan',
-      'Digital scan revealed internal issues.',
-      'Scan used at wrong time.'
-    );
-  }
-
-  function giveMedicine() {
-    performStep('medicine',
-      'Medication administered safely.',
-      'Medication was not appropriate yet.'
-    );
-  }
-
-  function applyCast() {
-    performStep('cast',
-      'Injury stabilized with cast.',
-      'Cast applied too early.'
-    );
-  }
-
-  function performTreatment() {
-    performStep('treatment',
-      'Supportive treatment improved condition.',
-      'Treatment applied incorrectly.'
-    );
-  }
-
-  function askAssistant() {
-    const patient = patients[currentPatient];
-    const nextStep = patient.correctSteps[completedSteps.length];
-
-    const hints = {
-      examine: 'Start with examination and vitals.',
-      xray: 'Imaging may help diagnose bone issues.',
-      blood: 'Lab tests can confirm internal conditions.',
-      scan: 'Use diagnostic scanning tools.',
-      medicine: 'Medication may be required now.',
-      cast: 'Stabilization may be needed.',
-      treatment: 'Supportive treatment is next.'
-    };
-
-    document.getElementById('assistantFact').textContent = hints[nextStep];
-    addLog('🧑‍⚕️ Assistant provided guidance.');
-    score += 10;
+  if (health <= 0) {
+    health = 0;
+    addLog("🚨 Patient condition became critical due to incorrect treatment.");
+    score = Math.max(0, score - 50);
     scoreEl.textContent = score;
-    updateLevel();
+    setTimeout(nextPatient, 1200);
+  }
+}
+
+function loadPatient() {
+  const p = patients[currentPatient];
+
+  document.getElementById('patientName').textContent = p.name;
+  document.getElementById('animalEmoji').textContent = p.emoji;
+  document.getElementById('conditionText').textContent = p.condition;
+
+  document.getElementById('careerFact').innerHTML =
+    `<strong>${p.diagnosis}</strong><br>${p.fact}`;
+
+  health = 35;
+  updateHealth();
+  addLog("🩺 New patient arrived: " + p.name);
+}
+
+function perform(step) {
+  const p = patients[currentPatient];
+  const expected = p.correctSteps.shift(); // safe progression
+
+  if (step === expected) {
+    score += 50;
+    health = Math.min(100, health + 20);
+    addLog("✅ Correct step: " + step);
+  } else {
+    health -= 20;
+    addLog("❌ Wrong step: " + step);
   }
 
-  function endGame() {
-    document.getElementById('successScreen').style.display = 'flex';
+  scoreEl.textContent = score;
+  updateHealth();
 
-    document.querySelector('#successScreen p').innerHTML = `
-      Final Score: <strong>${score}</strong><br><br>
-      Final Level: <strong>${level}</strong><br><br>
-      You completed your vet clinic shift using medical science, teamwork, and diagnostics.
-    `;
+  if (p.correctSteps.length === 0) {
+    addLog("🎉 Patient treated successfully!");
+    setTimeout(nextPatient, 1000);
   }
+}
 
-  function restartGame() {
-    currentPatient = 0;
-    score = 0;
-    reputation = 100;
-    timeLeft = 180;
-    level = 1;
-
-    scoreEl.textContent = score;
-    timerEl.textContent = timeLeft;
-    logBox.innerHTML = '';
-
-    document.getElementById('successScreen').style.display = 'none';
-
+function nextPatient() {
+  currentPatient++;
+  if (currentPatient >= patients.length) {
+    endGame();
+  } else {
     loadPatient();
   }
+}
 
-  setInterval(() => {
-    timeLeft--;
-    timerEl.textContent = timeLeft;
+function examinePatient(){ perform('examine'); }
+function runXray(){ perform('xray'); }
+function useScanner(){ perform('scan'); }
+function runBloodTest(){ perform('blood'); }
+function giveMedicine(){ perform('medicine'); }
+function applyCast(){ perform('cast'); }
+function performTreatment(){ perform('treatment'); }
 
-    if (timeLeft <= 0) endGame();
-  }, 1000);
+function askAssistant(){
+  addLog("🧑‍⚕️ Assistant: Follow the correct diagnostic order carefully.");
+  score += 10;
+  scoreEl.textContent = score;
+}
 
-  loadPatient();
+function endGame(){
+  document.getElementById('successScreen').style.display = 'flex';
+  document.querySelector('#successScreen p').innerHTML =
+    `Final Score: <b>${score}</b>`;
+}
+
+function restartGame(){
+  location.reload();
+}
+
+// init
+loadPatient();
+
+setInterval(() => {
+  let t = parseInt(timerEl.textContent);
+  if (t > 0) timerEl.textContent = t - 1;
+  else endGame();
+}, 1000);
+
 </script>
