@@ -16,7 +16,7 @@ body {
 }
 .game-container {
   width: 100%;
-  max-width: 1150px;
+  max-width: 1180px;
   background: white;
   border-radius: 24px;
   overflow: hidden;
@@ -74,7 +74,7 @@ body {
 .health-fill {
   height: 100%;
   background: linear-gradient(to right, #ef4444, #22c55e);
-  width: 65%;
+  width: 40%;
   transition: width 0.4s;
 }
 
@@ -169,12 +169,12 @@ button:hover { background: #0284c7; transform: translateY(-2px); }
 </div>
 
 <script>
-// Game Data
+// Combined Patient Data (from your original + new ones)
 const patientsPool = [
-  { name: "Bella the Dog", emoji: "🐶", condition: "Ear Infection" },
-  { name: "Milo the Cat", emoji: "🐱", condition: "Broken Leg" },
-  { name: "Luna the Rabbit", emoji: "🐰", condition: "Tummy Problem" },
-  { name: "Rio the Bird", emoji: "🐦", condition: "Breathing Trouble" }
+  { name: "Bella the Dog", emoji: "🐶", condition: "Ear Infection", steps: 4 },
+  { name: "Milo the Cat", emoji: "🐱", condition: "Broken Leg", steps: 4 },
+  { name: "Luna the Rabbit", emoji: "🐰", condition: "Tummy Problem", steps: 4 },
+  { name: "Rio the Bird", emoji: "🐦", condition: "Breathing Trouble", steps: 4 }
 ];
 
 let currentPatient, score = 0, deaths = 0, level = 1, health = 100, stepIndex = 0, assistantUsed = false;
@@ -193,7 +193,10 @@ const actionList = [
 function loadNewPatient() {
   currentPatient = patientsPool[Math.floor(Math.random() * patientsPool.length)];
   stepIndex = 0;
-  health = Math.max(65, 95 - (level * 6));
+  
+  // Health starts low (sick but not dead)
+  health = 35 + Math.random() * 15;   // Between 35% and 50%
+  
   assistantUsed = false;
 
   document.getElementById("patientName").textContent = currentPatient.name;
@@ -202,7 +205,7 @@ function loadNewPatient() {
 
   renderButtons();
   updateHealth();
-  addLog(`🆕 New patient: ${currentPatient.name}`);
+  addLog(`🆕 New patient: ${currentPatient.name} (${currentPatient.condition})`);
 }
 
 function updateHealth() {
@@ -217,7 +220,7 @@ function updateHealth() {
 function failPatient() {
   deaths++;
   score = Math.max(0, score - 100);
-  addLog("💀 Patient died... Try again!");
+  addLog("💀 Patient died... Be more careful next time!");
   updateUI();
 
   if (deaths >= 3) {
@@ -228,28 +231,24 @@ function failPatient() {
 }
 
 function perform(actionId) {
-  const isCorrect = true;   // All buttons are useful now - simpler for kids
-
-  if (isCorrect) {
-    const action = actionList.find(a => a.id === actionId);
-    addLog(`✅ Good job! ${action.name}`);
-    health = Math.min(100, health + 25);
-    score += 55 + (level * 10);
-    
-    document.getElementById("patientCard").classList.add("heal");
-    setTimeout(() => document.getElementById("patientCard").classList.remove("heal"), 700);
-    
-    stepIndex++;
-  } else {
-    health -= 22;
-  }
+  const action = actionList.find(a => a.id === actionId);
+  
+  // Most actions are helpful (kid-friendly)
+  addLog(`✅ Good job! ${action.name}`);
+  health = Math.min(100, health + 26);
+  score += 55 + (level * 12);
+  
+  document.getElementById("patientCard").classList.add("heal");
+  setTimeout(() => document.getElementById("patientCard").classList.remove("heal"), 700);
+  
+  stepIndex++;
 
   updateHealth();
   updateUI();
 
   if (stepIndex >= 4) {
-    addLog("🎉 Patient is healthy again! You're a great vet!");
-    score += 160;
+    addLog("🎉 Patient is all better! Great work doctor!");
+    score += 180;
     setTimeout(loadNewPatient, 900);
   }
 }
@@ -257,9 +256,9 @@ function perform(actionId) {
 function callAssistant() {
   if (assistantUsed) return;
   assistantUsed = true;
-  addLog("👩‍⚕️ Mia helped! Great teamwork!");
-  health = Math.min(100, health + 32);
-  score += 45;
+  addLog("👩‍⚕️ Mia helped! Teamwork saved the day!");
+  health = Math.min(100, health + 35);
+  score += 50;
   updateHealth();
   updateUI();
 }
@@ -277,9 +276,9 @@ function renderButtons() {
 }
 
 function updateUI() {
-  document.getElementById("score").textContent = score;
+  document.getElementById("score").textContent = Math.floor(score);
   document.getElementById("deaths").textContent = deaths;
-  level = Math.floor(score / 400) + 1;
+  level = Math.floor(score / 450) + 1;
   document.getElementById("level").textContent = level;
 }
 
@@ -287,7 +286,7 @@ function addLog(text) {
   const div = document.createElement("div");
   div.textContent = text;
   logBox.prepend(div);
-  if (logBox.children.length > 10) logBox.removeChild(logBox.lastChild);
+  if (logBox.children.length > 11) logBox.removeChild(logBox.lastChild);
 }
 
 function showOverlay(title, message) {
@@ -297,14 +296,16 @@ function showOverlay(title, message) {
 }
 
 function restartGame() {
-  score = 0; deaths = 0; level = 1;
+  score = 0; 
+  deaths = 0; 
+  level = 1;
   document.getElementById("overlay").style.display = "none";
   logBox.innerHTML = "";
   loadNewPatient();
   updateUI();
 }
 
-// Start the game
+// Start Game
 loadNewPatient();
 updateUI();
 </script>
