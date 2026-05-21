@@ -1,192 +1,190 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Vet Hero Clinic</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Vet Hero Clinic</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-    }
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
 
-    body {
-      background: linear-gradient(to bottom right, #dff4ff, #f4fbff);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
+body {
+  background: linear-gradient(to bottom right, #dff4ff, #f4fbff);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
 
-    .game-container {
-      width: 100%;
-      max-width: 1100px;
-      background: white;
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    }
+.game-container {
+  width: 100%;
+  max-width: 1100px;
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
 
-    .topbar {
-      background: #0f766e;
-      color: white;
-      padding: 20px;
-      display: flex;
-      justify-content: space-between;
-    }
+.topbar {
+  background: #0f766e;
+  color: white;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+}
 
-    .title {
-      font-size: 2rem;
-      font-weight: bold;
-    }
+.title {
+  font-size: 2rem;
+  font-weight: bold;
+}
 
-    .main {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 20px;
-      padding: 20px;
-    }
+.main {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+  padding: 20px;
+}
 
-    .clinic-room {
-      background: #eef9ff;
-      border-radius: 20px;
-      padding: 20px;
-      position: relative;
-      min-height: 500px;
-    }
+.clinic-room {
+  background: #eef9ff;
+  border-radius: 20px;
+  padding: 20px;
+  position: relative;
+  min-height: 500px;
+}
 
-    .patient-card {
-      background: white;
-      padding: 20px;
-      border-radius: 15px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
+.patient-card {
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
 
-    .animal {
-      font-size: 5rem;
-      text-align: center;
-      margin: 10px 0;
-    }
+.animal {
+  font-size: 5rem;
+  text-align: center;
+  margin: 10px 0;
+}
 
-    .health-bar {
-      width: 100%;
-      height: 25px;
-      background: #ddd;
-      border-radius: 12px;
-      overflow: hidden;
-      margin: 10px 0;
-    }
+.health-bar {
+  width: 100%;
+  height: 25px;
+  background: #ddd;
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 10px 0;
+}
 
-    .health-fill {
-      height: 100%;
-      background: linear-gradient(to right, red, green);
-      width: 60%;
-      transition: width 0.3s;
-    }
+.health-fill {
+  height: 100%;
+  background: linear-gradient(to right, red, green);
+  width: 60%;
+  transition: width 0.3s;
+}
 
-    .actions {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-top: 15px;
-    }
+.actions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 15px;
+}
 
-    button {
-      padding: 12px;
-      border: none;
-      border-radius: 10px;
-      background: #0ea5e9;
-      color: white;
-      cursor: pointer;
-      font-weight: bold;
-    }
+button {
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: #0ea5e9;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+}
 
-    button:hover {
-      background: #0284c7;
-    }
+button:hover {
+  background: #0284c7;
+}
 
-    .sidebar {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
 
-    .panel {
-      background: #f8fafc;
-      padding: 15px;
-      border-radius: 15px;
-    }
+.panel {
+  background: #f8fafc;
+  padding: 15px;
+  border-radius: 15px;
+}
 
-    .log {
-      height: 200px;
-      overflow-y: auto;
-      background: white;
-      padding: 10px;
-      border-radius: 10px;
-      font-size: 0.9rem;
-    }
+.log {
+  height: 200px;
+  overflow-y: auto;
+  background: white;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+}
 
-    /* OVERLAY */
-    .overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,0.9);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      color: white;
-      text-align: center;
-      padding: 20px;
-      border-radius: 20px;
-    }
+/* OVERLAY */
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  color: white;
+  text-align: center;
+  padding: 20px;
+  border-radius: 20px;
+}
 
-    .restart-btn {
-      margin-top: 20px;
-      background: #22c55e;
-    }
+.restart-btn {
+  margin-top: 20px;
+  background: #22c55e;
+}
 
-    /* 🐾 RECOVERY ANIMATION */
-    .recover {
-      animation: recoverAnim 0.8s ease;
-    }
+/* 💀 death animation */
+.die {
+  animation: dieAnim 1s ease forwards;
+}
 
-    @keyframes recoverAnim {
-      0% { transform: scale(1); }
-      30% { transform: scale(1.2); filter: drop-shadow(0 0 10px #22c55e); }
-      100% { transform: scale(1); }
-    }
+@keyframes dieAnim {
+  0% { transform: translateX(0); opacity: 1; }
+  25% { transform: translateX(-10px); }
+  50% { transform: translateX(10px); }
+  100% { transform: translateY(20px); opacity: 0; filter: grayscale(1); }
+}
 
-    /* 💀 DEATH ANIMATION */
-    .die {
-      animation: dieAnim 1s ease forwards;
-    }
+/* 🟢 HEAL ANIMATION (NEW) */
+.heal {
+  animation: healAnim 0.8s ease;
+}
 
-    @keyframes dieAnim {
-      0% { transform: translateX(0); opacity: 1; }
-      20% { transform: translateX(-10px); }
-      40% { transform: translateX(10px); }
-      60% { transform: translateX(-10px); }
-      80% { transform: translateX(10px); }
-      100% { transform: translateY(20px); opacity: 0; filter: grayscale(1); }
-    }
+@keyframes healAnim {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.25); filter: drop-shadow(0 0 12px #22c55e); }
+  100% { transform: scale(1); }
+}
 
-    /* red flash */
-    .flash {
-      animation: flash 0.5s ease;
-    }
+/* 🟡 LEVEL UP ANIMATION */
+.levelup {
+  animation: levelUpAnim 1s ease;
+}
 
-    @keyframes flash {
-      0% { background: #eef9ff; }
-      50% { background: #fecaca; }
-      100% { background: #eef9ff; }
-    }
+@keyframes levelUpAnim {
+  0% { transform: scale(1); color: white; }
+  30% { transform: scale(1.3); color: #facc15; }
+  100% { transform: scale(1); color: white; }
+}
 
-  </style>
+</style>
 </head>
 
 <body>
@@ -195,7 +193,11 @@
 
   <div class="topbar">
     <div class="title">🐾 Vet Hero Clinic</div>
-    <div>⭐ Score: <span id="score">0</span> | 💀 Deaths: <span id="deaths">0</span>/3</div>
+    <div>
+      ⭐ Score: <span id="score">0</span> |
+      💀 Deaths: <span id="deaths">0</span>/3 |
+      🏆 Level: <span id="level">1</span>
+    </div>
   </div>
 
   <div class="main">
@@ -224,12 +226,10 @@
     </div>
 
     <div class="sidebar">
-
       <div class="panel">
         <h3>📋 Log</h3>
         <div class="log" id="logBox"></div>
       </div>
-
     </div>
 
   </div>
@@ -251,8 +251,29 @@ let stepIndex = 0;
 let deaths = 0;
 const maxDeaths = 3;
 
+let level = 1;
+
 const healthFill = document.getElementById("healthFill");
 const logBox = document.getElementById("logBox");
+
+function updateLevel(){
+  const newLevel = Math.floor(score / 300) + 1;
+
+  if(newLevel > level){
+    level = newLevel;
+
+    const lvl = document.getElementById("level");
+    lvl.classList.add("levelup");
+
+    setTimeout(() => {
+      lvl.classList.remove("levelup");
+    }, 1000);
+
+    addLog("🏆 LEVEL UP! You are now Level " + level);
+  }
+
+  document.getElementById("level").textContent = level;
+}
 
 function loadPatient(){
   const p = patients[currentPatient];
@@ -268,17 +289,16 @@ function loadPatient(){
   addLog("New patient: " + p.name);
 }
 
-function animateAnimal(type){
+function animate(type){
   const animal = document.getElementById("animalEmoji");
-  animal.classList.remove("recover","die");
+  animal.classList.remove("heal","die");
 
-  if(type === "recover") animal.classList.add("recover");
-
+  if(type === "heal") animal.classList.add("heal");
   if(type === "die") animal.classList.add("die");
 
   setTimeout(() => {
-    animal.classList.remove("recover","die");
-  }, 1000);
+    animal.classList.remove("heal","die");
+  }, 900);
 }
 
 function updateHealth(){
@@ -286,9 +306,7 @@ function updateHealth(){
     health = 0;
     healthFill.style.width = "0%";
 
-    animateAnimal("die");
-    document.getElementById("room").classList.add("flash");
-
+    animate("die");
     setTimeout(() => failPatient(), 800);
     return;
   }
@@ -303,12 +321,11 @@ function failPatient(){
   if(score < 0) score = 0;
 
   deaths++;
-  document.getElementById("score").textContent = score;
 
-  document.getElementById("deaths").textContent = deaths;
+  updateUI();
 
   if(deaths >= maxDeaths){
-    showGameOver("Too many patients were lost in your clinic.");
+    showGameOver("Too many patients were lost.");
     return;
   }
 
@@ -342,13 +359,13 @@ function perform(action){
     health += 25;
     score += 50;
 
-    animateAnimal("recover");
+    animate("heal"); // 🟢 heal animation
   } else {
     addLog("❌ Wrong step");
     health -= 20;
   }
 
-  document.getElementById("score").textContent = score;
+  updateUI();
   updateHealth();
 
   if(stepIndex >= p.steps.length){
@@ -356,6 +373,12 @@ function perform(action){
     score += 100;
     nextPatient();
   }
+}
+
+function updateUI(){
+  document.getElementById("score").textContent = score;
+  document.getElementById("deaths").textContent = deaths;
+  updateLevel();
 }
 
 function addLog(text){
@@ -377,18 +400,19 @@ function restartGame(){
   currentPatient = 0;
   score = 0;
   deaths = 0;
+  level = 1;
   health = 60;
   stepIndex = 0;
 
   document.getElementById("overlay").style.display = "none";
-  document.getElementById("score").textContent = score;
-  document.getElementById("deaths").textContent = deaths;
   logBox.innerHTML = "";
 
+  updateUI();
   loadPatient();
 }
 
 loadPatient();
+updateUI();
 
 </script>
 
