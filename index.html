@@ -3,43 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vet Hero Game</title>
+    <title>Vet Clinic Pro</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; text-align: center; background: #e8f5e9; padding: 20px; }
-        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
-        .btn { margin: 10px; padding: 15px 25px; font-size: 18px; cursor: pointer; background: #2e7d32; color: white; border: none; border-radius: 10px; }
-        #pet-icon { font-size: 80px; margin: 20px 0; }
+        body { font-family: 'Arial', sans-serif; background: #f0f4f8; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        #game-container { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); text-align: center; width: 350px; }
+        .hidden { display: none; }
+        button { padding: 12px 25px; margin: 10px; cursor: pointer; border: none; border-radius: 8px; background: #3498db; color: white; font-weight: bold; }
+        button:hover { background: #2980b9; }
+        #pet { font-size: 80px; margin: 20px 0; }
+        .stats { font-size: 1.2rem; font-weight: bold; color: #2c3e50; }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h1>🐾 Vet Hero</h1>
-        <div id="pet-icon">🐶</div>
-        <p>Pet Health: <span id="health">50</span>%</p>
-        
-        <button class="btn" onclick="treat('examine')">Use Stethoscope</button>
-        <button class="btn" onclick="treat('medicine')">Give Medicine</button>
-        
-        <p id="feedback">The puppy feels sick. Help him!</p>
+<div id="game-container">
+    <div id="start-screen">
+        <h1>Vet Clinic Pro</h1>
+        <p>Keep the pets healthy! If health hits 0%, it's game over.</p>
+        <button onclick="startGame()">Start Game</button>
     </div>
 
-    <script>
-        let health = 50;
-        function treat(action) {
-            if (action === 'examine') {
-                health += 20;
-                document.getElementById('feedback').innerHTML = "Good science! You checked his lungs.";
-            } else {
-                health += 30;
-                document.getElementById('feedback').innerHTML = "Great job! He's feeling much better.";
-            }
-            document.getElementById('health').innerHTML = health;
-            if (health >= 100) {
-                document.getElementById('feedback').innerHTML = "🎉 You saved the puppy! You're a hero!";
-                document.getElementById('pet-icon').innerHTML = "🐕";
-            }
+    <div id="game-screen" class="hidden">
+        <div class="stats">Health: <span id="health">100</span>% | Score: <span id="score">0</span></div>
+        <div id="pet">🐶</div>
+        <button onclick="action('examine')">Examine</button>
+        <button onclick="action('treat')">Treat</button>
+        <p id="msg">A patient needs help!</p>
+    </div>
+</div>
+
+<script>
+    let health = 100;
+    let score = 0;
+    let gameActive = false;
+    const pets = ['🐶', '🐱', '🐹', '🐰', '🦜'];
+
+    function startGame() {
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('game-screen').classList.remove('hidden');
+        gameActive = true;
+        gameLoop();
+    }
+
+    function action(type) {
+        if (!gameActive) return;
+        if (type === 'examine') {
+            score += 10;
+            document.getElementById('msg').innerText = "Good diagnostic!";
+        } else {
+            score += 20;
+            document.getElementById('msg').innerText = "Excellent treatment!";
         }
-    </script>
+        updateDisplay();
+    }
+
+    function gameLoop() {
+        if (!gameActive) return;
+        health -= 5;
+        if (health <= 0) {
+            gameActive = false;
+            alert("Game Over! Final Score: " + score);
+            location.reload();
+        }
+        document.getElementById('pet').innerText = pets[Math.floor(Math.random() * pets.length)];
+        updateDisplay();
+        setTimeout(gameLoop, 2000);
+    }
+
+    function updateDisplay() {
+        document.getElementById('health').innerText = health;
+        document.getElementById('score').innerText = score;
+    }
+</script>
 </body>
 </html>
